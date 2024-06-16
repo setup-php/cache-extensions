@@ -82,6 +82,7 @@ setup_extensions() {
 add_library_helper() {
   dep_name=$1
   cache_dir=$2
+  [ -e "$cache_dir"/list ] && grep -Eq "^$dep_name" "$cache_dir"/list && return
   echo "$dep_name" | sudo tee -a "$cache_dir"/list >/dev/null 2>&1
   (
     cd "$brew_cellar" || exit 1
@@ -97,7 +98,7 @@ add_library() {
   lib=$1
   cache_dir=$2
   brew list "$lib" &>/dev/null || brew install "$lib"
-  IFS=' ' read -r -a deps_array <<<"$(brew deps "$lib" | tr '\n' ' ')"
+  IFS=' ' read -r -a deps_array <<<"$(brew deps --formula "$lib" | tr '\n' ' ')"
   to_wait=()
   for dep_name in "$lib" "${deps_array[@]}"; do
     add_library_helper "$dep_name" "$cache_dir" &
@@ -142,13 +143,13 @@ setup_libraries() {
   sudo cp -a "$tap_dir"/"$ext_tap"/.github/deps/"$extension"/*.rb "$tap_dir"/"$core_tap"/Formula/ 2>/dev/null || true
   sudo mkdir -p "$ext_deps_dir"
   echo "::group::Logs to set up libraries required for $extension"
-  for lib in "${libraries_array[@]}"; do
-    if ! [ -e "$ext_deps_dir"/list ]; then
+  if ! [ -e "$ext_deps_dir"/list ]; then
+    for lib in "${libraries_array[@]}"; do
       add_library "$lib" "$ext_deps_dir"
-    else
-      restore_library "$ext_deps_dir"
-    fi
-  done
+    done
+  else
+    restore_library "$ext_deps_dir"
+  fi
   echo "::endgroup::"
   add_log "$tick" "${libraries_array[@]}"
 }
@@ -165,7 +166,7 @@ setup_dependencies() {
     add_brew_tap "$ext_tap"        
     for extension in "${extensions_array[@]}"; do
       IFS=' ' read -r -a dependency_array <<<"$(get_dependencies "$extension")"
-      IFS=' ' read -r -a extension_array <<<"$(echo "${dependency_array[@]}" | grep -Eo "[a-z]*@" | sed 's/@//' | tr '\n' ' ')"
+      IFS=' ' read -r -a extension_array <<<"$(echo "${dependency_array[@]}" | grep -Eo "shivammathur[a-z\/]*@" | cut -d '/' -f 3 | sed 's/@//' | tr '\n' ' ')"
       IFS=' ' read -r -a libraries_array <<<"${dependency_array[@]//shivammathur*/}"
       if [[ -n "${libraries_array[*]// /}" ]]; then
         step_log "Setup libraries for $extension"
@@ -177,6 +178,10 @@ setup_dependencies() {
       fi
     done
   fi
+}
+
+self_hosted_helper() {
+    :
 }
 
 export HOMEBREW_CHANGE_ARCH_TO_ARM=1
