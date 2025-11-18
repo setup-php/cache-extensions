@@ -53,8 +53,9 @@ Cache PHP extensions in [GitHub Actions](https://github.com/features/actions "Gi
 | Windows Server 2025 | x64     | `windows-2025`                     |
 | Windows Server 2022 | x64     | `windows-latest` or `windows-2022` |
 | Windows Server 2019 | x64     | `windows-2019`                     |
-| macOS Sequoia 15.x  | arm64   | `macos-15`                         |
-| macOS Sonoma 14.x   | arm64   | `macos-latest` or `macos-14`       |
+| macOS Tahoe 26.x    | arm64   | `macos-26`                         |
+| macOS Sequoia 15.x  | arm64   | `macos-latest` or `macos-15`       |
+| macOS Sonoma 14.x   | arm64   | `macos-14`                         |
 | macOS Ventura 13.x  | x86_64  | `macos-13`                         |
 
 **Note**: Support for self-hosted runners for the above operating systems is in beta. If you use this action on a self-hosted runner, please report any issues you find.
@@ -108,14 +109,14 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest, windows-latest, macos-latest]
-        php-versions: ['8.1', '8.2', '8.3']
+        php-versions: ['8.2', '8.3', '8.4']
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     env:
       extensions: intl, pcov
       key: cache-v1 # can be any string, change to clear the extension cache.
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
 
     - name: Setup cache environment
       id: extcache

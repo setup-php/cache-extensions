@@ -107,7 +107,12 @@ data() {
     os="Windows-$arch"
     dir='C:\\tools\\php\\ext'
   fi
-  job="${GITHUB_REPOSITORY}-${GITHUB_WORKFLOW}-${GITHUB_JOB}"
+  [[ ( -z "$ImageOS" && -z "$ImageVersion" ) ||
+     ( -n "$RUNNER_ENVIRONMENT" && "$RUNNER_ENVIRONMENT" = "self-hosted" ) ||
+     -n "$ACT" || -n "$CONTAINER" ]] && _runner=self-hosted || _runner=github
+  runner="${runner:-${RUNNER:-$_runner}}"
+  job="${GITHUB_REPOSITORY}-${GITHUB_WORKFLOW}"
+  [ "$runner" = "github" ] && job="$job-${GITHUB_JOB}"
   if command -v "sha256sum" >/dev/null; then
     key="$(echo -n "$extensions-$key-$job" | sha256sum | cut -d ' ' -f 1)"
   else
