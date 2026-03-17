@@ -42,6 +42,8 @@ get_api_version() {
   8.1) echo "20210902" ;;
   8.2) echo "20220829" ;;
   8.3) echo "20230831" ;;
+  8.4) echo "20240924" ;;
+  8.5) echo "20250925" ;;
   *) get_api_version_from_repo ;;
   esac
 }
@@ -88,7 +90,7 @@ linux_php_semver() {
 
 data() {
   old_versions="5.[3-5]"
-  date='20240716'
+  date='20260314'
   arch=$(uname -m)
   if [ "$os" = "Linux" ]; then
     . /etc/os-release
@@ -138,9 +140,10 @@ init() {
   export tick="✓"
   export cross="✗"
   script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)
+  platform_script="$script_dir/$(echo "$os" | tr '[:upper:]' '[:lower:]').sh"
   if [[ "$os" = "Linux" || "$os" = "Darwin" ]]; then
     # shellcheck disable=SC1090
-    . "$script_dir/$(echo "$os" | tr '[:upper:]' '[:lower:]').sh"
+    . "$platform_script"
     self_hosted_helper
   fi
 }
