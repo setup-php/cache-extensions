@@ -85,7 +85,22 @@ export async function run(): Promise<void> {
       await spu.getInput('extensions', true)
     );
     const key = await spu.getInput('key', true);
-    const dataScript = utils.scriptCall('data', extensions, version, key);
+    const shareCacheAcrossJobs =
+      (await spu.readEnv('share-cache-across-jobs')) === 'true'
+        ? 'true'
+        : 'false';
+    const shareCacheAcrossWorkflows =
+      (await spu.readEnv('share-cache-across-workflows')) === 'true'
+        ? 'true'
+        : 'false';
+    const dataScript = utils.scriptCall(
+      'data',
+      extensions,
+      version,
+      key,
+      shareCacheAcrossJobs,
+      shareCacheAcrossWorkflows
+    );
 
     await exec(dataScript.command, dataScript.args);
     await handleDependencies(extensions, version);

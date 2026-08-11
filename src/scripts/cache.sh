@@ -88,6 +88,17 @@ linux_php_semver() {
   fi
 }
 
+get_cache_scope() {
+  local scope="${GITHUB_REPOSITORY}"
+  if [ "${share_cache_across_workflows:-false}" != "true" ]; then
+    scope="$scope-${GITHUB_WORKFLOW}"
+  fi
+  if [ "$runner" = "github" ] && [ "${share_cache_across_jobs:-false}" != "true" ]; then
+    scope="$scope-${GITHUB_JOB}"
+  fi
+  echo "$scope"
+}
+
 data() {
   old_versions="5.[3-5]"
   date='20260314'
@@ -114,12 +125,11 @@ data() {
      ( -n "$RUNNER_ENVIRONMENT" && "$RUNNER_ENVIRONMENT" = "self-hosted" ) ||
      -n "$ACT" || -n "$CONTAINER" ]] && _runner=self-hosted || _runner=github
   runner="${runner:-${RUNNER:-$_runner}}"
-  job="${GITHUB_REPOSITORY}-${GITHUB_WORKFLOW}"
-  [ "$runner" = "github" ] && job="$job-${GITHUB_JOB}"
+  scope="$(get_cache_scope)"
   if command -v "sha256sum" >/dev/null; then
-    key="$(echo -n "$extensions-$key-$job" | sha256sum | cut -d ' ' -f 1)"
+    key="$(echo -n "$extensions-$key-$scope" | sha256sum | cut -d ' ' -f 1)"
   else
-    key="$(echo -n "$extensions-$key-$job" | openssl dgst -sha256 | cut -d ' ' -f 2)"
+    key="$(echo -n "$extensions-$key-$scope" | openssl dgst -sha256 | cut -d ' ' -f 2)"
   fi
   key="$os"-"$version"-"$key"-"$date"
   echo "$dir" > "${RUNNER_TEMP:?}"/dir
@@ -153,6 +163,8 @@ run=$1
 extensions=$2
 version=$3
 key=$4
+share_cache_across_jobs=${5:-false}
+share_cache_across_workflows=${6:-false}
 os="$(uname -s)"
 init
 $run
