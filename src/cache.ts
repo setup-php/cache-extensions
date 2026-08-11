@@ -39,6 +39,7 @@ export function shouldHandleDependencies(
  *
  * @param extensions
  * @param version
+ * @param platform
  */
 export async function handleDependencies(
   extensions: string,
