@@ -28,7 +28,11 @@ const readEnv = jest.fn() as jest.MockedFunction<
 >;
 const readPHPVersion = jest.fn() as jest.MockedFunction<() => Promise<string>>;
 const restoreCache = jest.fn() as jest.MockedFunction<
-  (paths: string[], primaryKey: string, restoreKeys?: string[]) => Promise<string | undefined>
+  (
+    paths: string[],
+    primaryKey: string,
+    restoreKeys?: string[]
+  ) => Promise<string | undefined>
 >;
 const saveCache = jest.fn() as jest.MockedFunction<
   (paths: string[], key: string) => Promise<number>
@@ -115,6 +119,7 @@ function toFileHref(path: string): string {
 
 describe('cache.ts', () => {
   let dirs: TestDirs;
+  let environment: Record<string, string>;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -123,17 +128,13 @@ describe('cache.ts', () => {
     exec.mockResolvedValue(0);
     restoreCache.mockResolvedValue(undefined);
     saveCache.mockResolvedValue(1);
-    readEnv.mockImplementation(async (name: string): Promise<string> => {
-      if (name === 'RUNNER_TEMP') {
-        return dirs.runnerTemp;
-      }
-
-      if (name === 'RUNNER_TOOL_CACHE') {
-        return dirs.toolCache;
-      }
-
-      return dirs.root;
-    });
+    environment = {
+      RUNNER_TEMP: dirs.runnerTemp,
+      RUNNER_TOOL_CACHE: dirs.toolCache
+    };
+    readEnv.mockImplementation(
+      async (name: string): Promise<string> => environment[name] ?? ''
+    );
   });
 
   afterEach(() => {
@@ -150,9 +151,29 @@ describe('cache.ts', () => {
       'data',
       'xdebug, pcov',
       '5.4',
-      'cache-v1'
+      'cache-v1',
+      'false',
+      'false'
     ]);
     expect(restoreCache).not.toHaveBeenCalled();
+  });
+
+  it('passes cache-sharing environment flags to the data script', async () => {
+    setActionInputs('5.4', 'xdebug, pcov', 'cache-v1');
+    environment['share-cache-across-jobs'] = 'true';
+    environment['share-cache-across-workflows'] = 'true';
+
+    await cache.run();
+
+    expect(exec).toHaveBeenCalledWith('bash', [
+      utils.SCRIPT_PATH,
+      'data',
+      'xdebug, pcov',
+      '5.4',
+      'cache-v1',
+      'true',
+      'true'
+    ]);
   });
 
   it('skips dependency handling for unsupported PHP versions', async () => {
@@ -280,7 +301,9 @@ describe('cache.ts', () => {
       'data',
       'xdebug, sodium',
       '5.4',
-      'cache-v6'
+      'cache-v6',
+      'false',
+      'false'
     ]);
   });
 

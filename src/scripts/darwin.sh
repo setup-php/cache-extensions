@@ -86,7 +86,7 @@ setup_extensions_helper() {
   dependent_extension=$1
   dependency_extension=$2
   extension_dir=$3
-  dependency_extension_name="$(basename "$(echo $dependency_extension | cut -d'@' -f 1)")"
+  dependency_extension_name="$(basename "$(echo "$dependency_extension" | cut -d'@' -f 1)")"
   cached_extension="${deps_cache_directory:?}/$dependency_extension_name.so"
   if ! [ -e "$cached_extension" ]; then
     brew install "$dependency_extension"

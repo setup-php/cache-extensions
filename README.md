@@ -15,6 +15,7 @@ Cache PHP extensions in [GitHub Actions](https://github.com/features/actions "Gi
 - [OS/Platform Support](#cloud-osplatform-support)
 - [Usage](#memo-usage)
   - [Inputs](#inputs)
+  - [Flags](#flags)
   - [Workflow](#workflow)
   - [Thread Safe Setup](#thread-safe-setup)
 - [License](#scroll-license)
@@ -98,6 +99,34 @@ Use this GitHub Action when the extensions you are adding in [setup-php](https:/
 - Changing this would reset the cache.
 
 See [action.yml](action.yml "Metadata for this GitHub Action") and usage below for more info.
+
+### Flags
+
+> Specify using the `env` keyword
+
+#### `share-cache-across-jobs` (optional)
+
+- Specify `true` to share the cache across jobs in the same workflow.
+- By default, it is set to `false` and the job ID is included in the cache key.
+
+#### `share-cache-across-workflows` (optional)
+
+- Specify `true` to share the cache across workflows for the same job ID.
+- By default, it is set to `false` and the workflow ID is included in the cache key.
+- Enable both flags to share the cache across all jobs and workflows in the repository.
+
+```yaml
+- name: Setup cache environment
+  id: extcache
+  uses: shivammathur/cache-extensions@v1
+  with:
+    php-version: ${{ matrix.php-versions }}
+    extensions: ${{ env.extensions }}
+    key: ${{ env.key }}
+  env:
+    share-cache-across-jobs: true
+    share-cache-across-workflows: true
+```
 
 ### Workflow
 
