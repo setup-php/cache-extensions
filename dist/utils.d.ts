@@ -5,4 +5,5 @@ export type ScriptCall = {
 };
 export declare function getOutput(output: string): Promise<string>;
 export declare function filterExtensions(extension_csv: string): string;
+export declare function stripExtensionVersions(extension_csv: string): string;
 export declare function scriptCall(fn: string, ...args: string[]): ScriptCall;

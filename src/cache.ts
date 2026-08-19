@@ -58,7 +58,7 @@ export async function handleDependencies(
   const cacheHit = await cache.restoreCache([cacheDir], cacheKey, [cacheKey]);
   const dependencyScript = utils.scriptCall(
     'dependencies',
-    extensions,
+    utils.stripExtensionVersions(extensions),
     version
   );
 

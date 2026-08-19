@@ -54,6 +54,19 @@ describe('Utils tests', () => {
     expect(utils.filterExtensions('a, :b, c')).toBe('a, c');
   });
 
+  it('strips extension versions for dependency resolution', () => {
+    expect(
+      utils.stripExtensionVersions(
+        'redis-5.3.7, memcached-3.2.0, sqlsrv-5.12.0-beta1, xdebug-beta'
+      )
+    ).toBe('redis,memcached,sqlsrv,xdebug');
+    expect(
+      utils.stripExtensionVersions(
+        'xdebug2,mongodb-mongodb/mongo-php-driver@master'
+      )
+    ).toBe('xdebug2,mongodb-mongodb/mongo-php-driver@master');
+  });
+
   it('checking SCRIPT_PATH', () => {
     expect(utils.SCRIPT_PATH).toBe(
       join(import.meta.dirname, '../src/scripts/cache.sh')
