@@ -212,6 +212,24 @@ describe('cache.ts', () => {
     expect(saveCache).not.toHaveBeenCalled();
   });
 
+  it('resolves dependencies using unversioned extension names', async () => {
+    writeKeyOutput(dirs.runnerTemp, 'cache-versioned');
+    restoreCache.mockResolvedValue('cache-hit');
+
+    await cache.handleDependencies(
+      'redis-5.3.7, memcached-3.2.0, xdebug-beta',
+      '8.3',
+      'linux'
+    );
+
+    expect(exec).toHaveBeenCalledWith('bash', [
+      utils.SCRIPT_PATH,
+      'dependencies',
+      'redis,memcached,xdebug',
+      '8.3'
+    ]);
+  });
+
   it('skips cache save when the dependency directory does not exist', async () => {
     writeKeyOutput(dirs.runnerTemp, 'cache-v3');
 

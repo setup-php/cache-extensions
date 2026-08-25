@@ -31,6 +31,22 @@ export function filterExtensions(extension_csv: string): string {
 }
 
 /**
+ * Strip exact versions and stability suffixes for dependency resolution.
+ * The original extension string is still used to generate the cache key.
+ *
+ * @param extension_csv
+ */
+export function stripExtensionVersions(extension_csv: string): string {
+  const versionPattern =
+    /-(?:v?\d+(?:\.\d+){0,3}(?:-?[a-z]+\d*)?|stable|beta|alpha|devel|snapshot|rc|preview)$/i;
+
+  return extension_csv
+    .split(',')
+    .map(extension => extension.trim().replace(versionPattern, ''))
+    .join(',');
+}
+
+/**
  * Function to get script call
  *
  * @param fn
