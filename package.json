@@ -1,6 +1,6 @@
 {
   "name": "cache-extensions",
-  "version": "1.15.6",
+  "version": "1.15.10",
   "private": false,
   "description": "Cache PHP extensions in GitHub Actions",
   "type": "module",
@@ -50,11 +50,11 @@
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.6.5",
-    "@typescript-eslint/eslint-plugin": "^8.71.2",
-    "@typescript-eslint/parser": "^8.71.2",
+    "@typescript-eslint/eslint-plugin": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.1",
     "@typescript/native": "npm:typescript@^7.0.2",
     "@vercel/ncc": "^0.45.0",
-    "eslint": "^10.12.0",
+    "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import-x": "^4.17.1",
@@ -69,13 +69,16 @@
     "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
   "overrides": {
+    "@actions/glob": "https://codeload.github.com/shivammathur/actions-glob/tar.gz/e8291fcebd288e5df38972b200cba8ac6943ce92",
     "@istanbuljs/load-nyc-config": {
       "js-yaml": "^4.3.2"
     },
     "brace-expansion@1.x": "^1.1.21",
+    "deepmerge": "https://codeload.github.com/shivammathur/deepmerge/tar.gz/9e04a97afa90b9d50883dd723f7d0fb0d2c16dca",
     "test-exclude": "^8.0.0",
-    "glob": "^13.0.6",
-    "undici": "^6.29.0"
+    "glob": "^14.0.3",
+    "minimatch": "^11.0.3",
+    "undici": "^6.29.1"
   },
   "bugs": {
     "url": "https://github.com/shivammathur/cache-extensions/issues"
